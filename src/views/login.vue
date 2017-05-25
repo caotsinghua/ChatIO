@@ -2,6 +2,7 @@
     <div class="login-wrap">
         <div class="blur"></div>
         <div class="mask"></div>
+    
         <div class="main">
             <div class="logo">
                 <h1>ChatIO</h1>
@@ -15,46 +16,64 @@
                 </Form-item>
                 <Button type="primary" :long="true" @click="login('loginForm')">登录</Button>
             </Form>
-            <a href="javascript:;" class="go-register">新用户注册</a>
+            <a href="javascript:;" class="go-register" @click="goRegister">新用户注册</a>
             <span class="bottom-msg">登录即代表阅读并同意<a href="#!">服务条款</a></span>
         </div>
-
+    
     </div>
 </template>
 <script>
+import apis from '../api.js'
 export default {
     data() {
         return {
-            loginForm:{
-                username:'',
-                password:'12'
+            loginForm: {
+                username: '',
+                password: ''
             },
-            loginRule:{
-                username:[
+            loginRule: {
+                username: [
                     {
-                        required:true,trigger:'blur',message:'用户名不能为空'
+                        required: true, trigger: 'blur', message: '用户名不能为空'
                     }
                 ],
-                password:[
-                    {required:true,trigger:'blur',message:'密码不能为空'},
-                    {min:6,max:15,message:'请输入6-15位密码',trigger:'blur'}
+                password: [
+                    { required: true, trigger: 'blur', message: '密码不能为空' },
+                    { min: 6, max: 15, message: '请输入6-15位密码', trigger: 'blur' }
                 ]
             }
         }
     },
-    methods:{
-        login(name){
-            this.$refs[name].validate((valid)=>{
-                if(valid){
+    computed: {
+
+    },
+    methods: {
+        login(name) {
+            this.$refs[name].validate((valid) => {
+                if (valid) {//登录
                     console.log('ok')
-                }else{
-                    this.$Notice.error({
-                        title:'登录失败',
-                        duration:2,
-                        desc:'信息填写错误！'
+                    let form = this.loginForm
+                    this.$http.post(apis.login, form).then(res => {
+
+                        if (res.data.success) {
+                            this.$Notice.success({
+                                title: '登录成功',
+                                duration: 1
+                            })
+                            this.$router.push('/userlist');
+                        } else {
+                            this.$Notice.error({
+                                title: '登录失败',
+                                duration: 2,
+                                desc: res.data.msg
+                            })
+                        }
                     })
                 }
             })
+        },
+        goRegister() {
+            this.$router.push('/register');
         }
     }
 }
@@ -92,23 +111,23 @@ export default {
                 font-weight: normal;
             }
         }
-        .login-form{
+        .login-form {
             margin-top: 3rem;
-            .input{
-                input{
+            .input {
+                input {
                     background: transparent;
-                    color:#fff;
+                    color: #fff;
                     padding: 1rem 0.5rem;
                 }
             }
         }
-        .go-register{
+        .go-register {
             align-self: flex-end;
             display: block;
             margin-top: 1rem;
         }
-        .bottom-msg{
-            color:#fff;
+        .bottom-msg {
+            color: #fff;
             align-self: center;
             margin-top: 14.5rem;
         }

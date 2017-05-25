@@ -6,6 +6,8 @@ import router from './router'
 import iView from 'iview'
 import Axios from 'axios'
 import IO from 'socket.io-client'
+import Vuex from 'vuex'
+import store from './vuex/index.js'
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
@@ -13,14 +15,16 @@ Vue.config.productionTip = false
  * 插件调用
  */
 Vue.use(iView);
+
 import 'iview/dist/styles/iview.css';
 import '../static/css/animate.css'
 Vue.prototype.$http=Axios;
 // const socket=IO('localhost:3000');
-Vue.prototype.$socket=IO('localhost:3000');
+Vue.prototype.$socket=IO('localhost:3000',{'force new connection': true});
 let vm=new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 })

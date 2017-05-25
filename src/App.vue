@@ -2,8 +2,9 @@
   <div id="app">
   <transition
   mode="out-in"
-  enter-active-class="animated bounceInRight"
+  enter-active-class="animated fadeInRight"
   leave-active-class="animated fadeOutLeft"
+  type="animation"
   > 
     <router-view></router-view>
   </transition>
@@ -17,6 +18,6 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 </style>

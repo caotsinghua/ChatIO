@@ -3,7 +3,7 @@
         <header class="header">
             <Row type="flex">
                 <Col span="8">
-                <a href="javascript:;" class="back-btn">
+                <a href="javascript:;" class="back-btn" @click="back">
                     <Icon type="chevron-left"></Icon>
                 </a>
                 </Col>
@@ -27,10 +27,10 @@
         <footer>
             <div class="input-wrap">
                 <Row>
-                    <Col span="22" style="padding:0 0.2rem">
+                    <Col span="20" style="padding:0 0.2rem">
                     <Input v-model="message"></Input>
                     </Col>
-                    <Col span="2">
+                    <Col span="4">
                     <Button type="primary" :disabled="message==''" @click="sendMessage">发送</Button>
                     </Col>
                 </Row>
@@ -65,8 +65,10 @@ export default {
         }
     },
     created() {       
+         console.log(this.$socket.id)
         this.$socket.on('newMessage',(msg)=>{
             this.pushMessage(msg);
+           
         })  
     },
     beforeRouteEnter(to,from,next){
@@ -89,6 +91,9 @@ export default {
                 msg.me=true;
             }
             this.messages.push(msg);
+        },
+        back(){
+            this.$router.back()
         }
     },
     components: {

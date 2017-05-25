@@ -1,6 +1,6 @@
 一个基于socket.io的聊天app
 前端vuejs
-后端express+mysql
+后端express+mongodb
 
 ## Build Setup
 
