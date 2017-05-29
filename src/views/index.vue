@@ -7,6 +7,7 @@
     </div>
 </template>
 <script>
+import apis from '../api.js'
 export default {
     data() {
         return {
@@ -15,9 +16,15 @@ export default {
     },
     beforeRouteEnter(to,from,next){
         next();
+        if(apis.readFromLocal().name){//每次进入应用判断是否已经登录
+            next('/userlist')
+            return;
+        }
         setTimeout(function(){
             next('/login')
         },2000)
+    },
+    methods:{
     }
 }
 </script>

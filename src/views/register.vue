@@ -73,7 +73,7 @@ export default {
 
 
                         if (res.data.success) {
-                            this.$Notice.ivu-alert-success({
+                            this.$Notice.success({
                                 title: '注册成功',
                                 duration: 1
                             })

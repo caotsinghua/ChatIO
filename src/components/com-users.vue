@@ -25,10 +25,11 @@
         },
         methods:{
             chatTo(user){
+                console.log(user)
                 this.$router.push({
                     path:'/chatting',
-                    params:{
-                        user:user
+                    query:{
+                        user:user.username
                     }
                 })
             }

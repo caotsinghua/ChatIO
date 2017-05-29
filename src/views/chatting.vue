@@ -8,7 +8,7 @@
                 </a>
                 </Col>
                 <Col span="8">
-                <h1 class="room-name">{{roomInfo.name}}</h1>
+                <h1 class="room-name">{{toUser.username}}</h1>
                 </Col>
                 <Col span="8"></Col>
             </Row>
@@ -18,7 +18,7 @@
                 <li :class="{'message':!item.me,'my-message':item.me}" v-for="(item,index) in messages" :key="index">
                     <img :src="item.avatar" class="avatar" />
                     <div class="content">
-                        <span>{{item.username}}:</span>
+                        <span>{{item.fromUser}}:</span>
                         <com-Message :msg="item.msg" :me="item.me"></com-Message>
                     </div>
                 </li>
@@ -40,60 +40,67 @@
 </template>
 <script>
 import comMsg from '../components/com-Message.vue'
+import apis from '../api.js'
 export default {
     data() {
         return {
-            userInfo:{
-                username:'me',
-                avatar:'http://d.5857.com/xgmn_150416/desk_007.jpg'
+            fromUser:{
+               
             },
-            roomInfo: {
-                name: 'socket聊天1'
+            toUser: {
+               
             },
             message: '',
-            messages: [{
-                avatar: 'http://d.5857.com/xgmn_150416/desk_007.jpg',
-                username: 'user1',
-                msg: '11ssssssssssssssssssssssssssssssssssssssssssssssss',
-                me: false
-            }, {
-                avatar: 'http://d.5857.com/xgmn_150416/desk_007.jpg',
-                username: 'user1',
-                msg: '11ssssssssssssssssssssssssssssssssssssssssssssssss',
-                me: true
-            }]
+            messages: []
         }
     },
     created() {       
-         console.log(this.$socket.id)
-        this.$socket.on('newMessage',(msg)=>{
-            this.pushMessage(msg);
-           
-        })  
+        this.init();
+        var _this=this;
+        this.$socket.on('to'+this.toUser.username,function(msgObj){
+            console.log(111)
+            _this.pushMessage(msgObj);
+        }) 
+        this.$socket.on('to'+this.fromUser.username,function(msgObj){
+            console.log(222)
+            _this.pushMessage(msgObj);
+        }) 
+       
     },
     beforeRouteEnter(to,from,next){
         console.log('即将进入聊天页面')
         //判断是否已经登录
+        if(!apis.readFromLocal().name){//只要localstorage存在用户id就是登录
+            next('/login')
+        }
         next()
     },
     methods: {
         sendMessage(){
             let msg={};
-            msg.username=this.userInfo.username;
-            msg.avatar=this.userInfo.avatar;
+            msg.toUser=this.toUser.username;
+            msg.fromUser=this.fromUser.username;
+            msg.avatar=this.fromUser.avatar;
             msg.msg=this.message;
-            msg.me=false;
+            msg.time=new Date();
+            console.log(msg)
             this.message='';
-            this.$socket.emit('newMessage',msg);
+            this.$socket.emit('sendMsg',msg);
         },
         pushMessage(msg){
-            if(msg.username==this.userInfo.username){//这里的msg是服务端触发传来的msg，通过判断与本地用户名是否相同，决定渲染方式
+            if(msg.fromUser==this.fromUser.username){//这里的msg是服务端触发传来的msg，通过判断与本地用户名是否相同，决定渲染方式
                 msg.me=true;
             }
             this.messages.push(msg);
         },
         back(){
             this.$router.back()
+        },
+        init(){
+            let query=this.$route.query;
+            this.toUser.username=query.user;
+            let u=apis.readFromLocal();
+            this.fromUser.username=u.name;
         }
     },
     components: {

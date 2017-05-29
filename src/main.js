@@ -19,8 +19,9 @@ Vue.use(iView);
 import 'iview/dist/styles/iview.css';
 import '../static/css/animate.css'
 Vue.prototype.$http=Axios;
+ Vue.prototype.$socket=IO('http://192.168.137.1:3000',{'force new connection': true});
 // const socket=IO('localhost:3000');
-Vue.prototype.$socket=IO('localhost:3000',{'force new connection': true});
+
 let vm=new Vue({
   el: '#app',
   router,

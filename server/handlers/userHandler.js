@@ -35,7 +35,10 @@ let userHandler={
                 }else{
                     return callback({
                         success:true,
-                        data:{userid:u._id},
+                        data:{user:{
+                            id:u._id,
+                            name:u.username
+                        }},
                         msg:'登录成功'
                     })
                 }

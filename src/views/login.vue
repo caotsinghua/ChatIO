@@ -47,22 +47,34 @@ export default {
     computed: {
 
     },
+    created() {
+
+    },
+    beforeRouteEnter(to, from, next) {
+        if (apis.readFromLocal().name) {//只要localstorage存在用户id就是登录
+            next('/userlist')
+        }
+        next()
+    },
     methods: {
         login(name) {
-            this.$refs[name].validate((valid) => {
+            let _this=this;
+            this.$refs[name].validate(function(valid){
                 if (valid) {//登录
                     console.log('ok')
-                    let form = this.loginForm
-                    this.$http.post(apis.login, form).then(res => {
-
+                    let form = _this.loginForm
+                    _this.$http.post(apis.login, form).then(res => {
                         if (res.data.success) {
-                            this.$Notice.success({
+                            let user=res.data.data.user;
+                            apis.saveToLocal(user);
+                            _this.$Notice.success({
                                 title: '登录成功',
                                 duration: 1
                             })
-                            this.$router.push('/userlist');
+                            _this.$socket.emit('addUser',user.name)
+                            _this.$router.push('/userlist');//直接进入好友i列表也
                         } else {
-                            this.$Notice.error({
+                            _this.$Notice.error({
                                 title: '登录失败',
                                 duration: 2,
                                 desc: res.data.msg

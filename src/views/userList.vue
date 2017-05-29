@@ -17,7 +17,8 @@
         </header>
         <Tabs value="name1">
             <Tab-pane label="好友" name="name1">
-                <com-users :users="users"></com-users>
+                <p v-if="users.length==0">没有人在线</p>
+                <com-users :users="users" ></com-users>
             </Tab-pane>
             <Tab-pane label="群组" name="name2">群组列表</Tab-pane>
         </Tabs>
@@ -25,23 +26,47 @@
 </template>
 <script>
 import comUsers from '../components/com-users'
+import apis from '../api.js'
 export default {
     data() {
         return {
             users: [
-                {
-                    username: 'me',
-                    avatar: 'http://d.5857.com/xgmn_150416/desk_007.jpg'
-                }, {
-                    username: 'me',
-                    avatar: 'http://d.5857.com/xgmn_150416/desk_007.jpg'
-                }
             ],
             me: {
-                username: 'tssword',
-                avatar: 'http://d.5857.com/xgmn_150416/desk_007.jpg'
+                username: '',
+                avatar: ''
             }
         }
+    },
+    created(){//只有登录了才能进入这一步
+
+        let user=apis.readFromLocal();
+        console.log(this.$socket)
+        this.$socket.emit('addUser',user.name);
+
+        this.me.username=user.name;
+        this.me.avatar='http://d.5857.com/xgmn_150416/desk_007.jpg';
+
+        let vm=this;
+        
+        this.$socket.on('getUser',function(users){
+            users.forEach(item=>{
+                let p={};
+                p.username=item;
+                p.avatar='http://d.5857.com/xgmn_150416/desk_007.jpg';
+                if(p.username!=vm.me.username)
+                vm.users.push(p);
+            })
+        })
+        this.$socket.emit('getUser');
+
+    },
+    beforeRouteEnter(to,from,next){//未登录直接转到登录页
+        //判断是否已经登录
+        if(!apis.readFromLocal().name){//只要localstorage存在用户id就是登录
+            next('/login')
+        }
+        next()
     },
     components: {
         'com-users': comUsers
